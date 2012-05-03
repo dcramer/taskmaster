@@ -6,8 +6,10 @@ Taskmaster
 Create an iterator::
 
     # mymodule/job.py
-    def get_jobs():
-        for i in xrange(100000000):
+    def get_jobs(last_job=0):
+        # last_job would be sent if state was resumed
+        # from a previous run
+        for i in xrange(last_job, 100000000):
             yield i
 
     def handle_job(i):
