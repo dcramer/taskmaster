@@ -3,7 +3,7 @@ Taskmaster
 
 **This is under development, and this README reflects the potential API**
 
-Create an iterator::
+Create an iterator, and callback::
 
     # mymodule/job.py
     def get_jobs(last_job=0):
