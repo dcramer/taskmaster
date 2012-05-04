@@ -6,7 +6,7 @@ Taskmaster
 Create an iterator, and callback::
 
     # mymodule/job.py
-    def get_jobs(last_job=0):
+    def get_jobs(last=0):
         # last_job would be sent if state was resumed
         # from a previous run
         for i in xrange(last_job, 100000000):
@@ -22,4 +22,4 @@ Spawn a master::
 
 Spawn slaves::
 
-    tm-slave mymodule.job:handle_job --host=127.0.0.1:3050 --key=foobar
+    tm-slave mymodule.job:handle_job --host=127.0.0.1:3050 --key=foobar --procs=1 --threads=1
