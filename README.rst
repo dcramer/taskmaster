@@ -15,7 +15,7 @@ have a large amount of tasks, especially when they contain a large amount of dat
 Imagine you have 1 billion tasks, each weighing in at 5k. Thats, uncompressed, at minimum 4 terabytes of storage
 required just to keep that around, and gains you very little.
 
-Taskmaster on the other hand is designed to take an resumable iterator, and only pull in a maximum number of
+Taskmaster on the other hand is designed to take a resumable iterator, and only pull in a maximum number of
 jobs at a time (using standard Python Queue's). This ensures a consistent memory pattern that can scale linearly.
 
 Usage
