@@ -29,8 +29,6 @@ class Worker(Thread):
                 except EOFError:
                     return
 
-                print repr(job)
-
                 try:
                     self.target(job)
                 except KeyboardInterrupt:
