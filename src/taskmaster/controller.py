@@ -68,10 +68,25 @@ class Controller(object):
                     print e
         return {}
 
+    def update_state(self, job_id, job, fp=None):
+        if job_id:
+            data = {
+                'job': job,
+                'job_id': job_id,
+            }
+        else:
+            data = {}
+        if not fp:
+            with open(self.state_file, 'w') as fp:
+                pickle.dump(data, fp)
+        else:
+            fp.seek(0)
+            pickle.dump(data, fp)
+
     def state_writer(self):
         last_job_id = None
-        with open(self.state_file, 'w') as state_fp:
-            while True:
+        with open(self.state_file, 'w') as fp:
+            while self.server.is_alive():
                 time.sleep(0)
                 try:
                     job_id, job = self.server.first_job()
@@ -84,11 +99,7 @@ class Controller(object):
                 if not job or job_id == last_job_id:
                     continue
 
-                state_fp.seek(0)
-                pickle.dump({
-                    'job': job,
-                    'job_id': job_id,
-                }, state_fp)
+                self.update_state(job_id, job, fp)
 
                 last_job_id = job_id
 
@@ -97,10 +108,6 @@ class Controller(object):
             unlink(self.state_file)
 
     def start(self):
-        self.server.start()
-        if self.pbar:
-            self.pbar.start()
-
         kwargs = {}
         last_job = self.read_state()
         if last_job:
@@ -109,10 +116,15 @@ class Controller(object):
         else:
             start_id = 0
 
+        self.server.start()
+        if self.pbar:
+            self.pbar.start()
+
         state_writer = Thread(target=self.state_writer)
         state_writer.daemon = True
         state_writer.start()
 
+        job_id, job = (None, None)
         for job_id, job in enumerate(self.target(**kwargs), start_id):
             self.server.put_job((job_id, job))
             time.sleep(0)
@@ -120,7 +132,10 @@ class Controller(object):
         while self.server.has_work():
             time.sleep(0)
 
+        self.server.shutdown()
         state_writer.join(1)
+
+        self.update_state(job_id, job)
+
         if self.pbar:
             self.pbar.finish()
-        self.server.shutdown()

@@ -30,6 +30,7 @@ class QueueServer(Thread):
     def run(self):
         self.started = True
         server = self.manager.get_server()
+        print "Taskmaster server running on %r" % ':'.join(map(str, server.address))
         server.serve_forever()
 
     def put_job(self, job):
@@ -41,11 +42,14 @@ class QueueServer(Thread):
     def has_work(self):
         return not self.queue.empty()
 
+    def is_alive(self):
+        return self.started
+
     def shutdown(self):
         # TODO:
         # if self.started:
         #     self.manager.shutdown()
-        pass
+        self.started = False
 
 
 def run(target, reset=False, size=10000, host='0.0.0.0:3050', key='taskmaster'):
