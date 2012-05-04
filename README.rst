@@ -32,7 +32,8 @@ Create an iterator, and callback::
             yield i
 
     def handle_job(i):
-        # is i the unserialized job
+        # this **must** be idempotent, as resuming the process may execute a job
+        # that had already been run
         print "Got %r!" % i
 
 
