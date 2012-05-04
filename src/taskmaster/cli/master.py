@@ -45,10 +45,6 @@ class QueueServer(Thread):
             self.server.shutdown()
 
 
-def sample(last=0):
-    return xrange(last, 1000000000)
-
-
 def run(target, size=10000, host='0.0.0.0:3050', key='taskmaster'):
     host, port = host.split(':')
 

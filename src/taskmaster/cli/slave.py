@@ -15,10 +15,6 @@ class QueueManager(BaseManager):
     pass
 
 
-def sample(job):
-    print job
-
-
 def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
     QueueManager.register('get_queue')
 
