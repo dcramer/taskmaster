@@ -40,13 +40,13 @@ Spawn a master::
 
     $ tm-master taskmaster.example:get_jobs
 
-Spawn as many slaves as you need::
+Spawn a slave::
 
     $ tm-slave taskmaster.example:handle_job
-    $ tm-slave taskmaster.example:handle_job
-    $ tm-slave taskmaster.example:handle_job
-    $ tm-slave taskmaster.example:handle_job
-    $ tm-slave taskmaster.example:handle_job
+
+Or spawn 8 slaves (each containing a threadpool)::
+
+    $ tm-spawn taskmaster.example:handle_job 8
 
 
 .. note:: All arguments are optional, and will default to localhost with no auth key.
