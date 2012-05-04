@@ -22,4 +22,4 @@ Spawn a master::
 
 Spawn slaves::
 
-    tm-slave mymodule.job:handle_job --host=127.0.0.1:3050 --key=foobar --procs=1 --threads=1
+    tm-slave mymodule.job:handle_job --host=127.0.0.1:3050 --key=foobar --threads=1

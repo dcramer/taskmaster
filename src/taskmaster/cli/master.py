@@ -8,63 +8,54 @@ taskmaster.cli.master
 
 from multiprocessing.managers import BaseManager
 from threading import Thread
+from taskmaster.controller import Controller
 import Queue
-import time
-
-
-class QueueServer(Thread):
-    def __init__(self, manager):
-        Thread.__init__(self)
-        self.manager = manager
-        self.server = None
-
-    def run(self):
-        self.server = self.manager.get_server()
-        self.server.serve_forever()
-
-    def shutdown(self):
-        if self.server:
-            self.server.shutdown()
 
 
 class QueueManager(BaseManager):
     pass
 
 
+class QueueServer(Thread):
+    def __init__(self, host, port, size=None, authkey=None):
+        Thread.__init__(self)
+        self.daemon = True
+        self.server = None
+        self.queue = Queue.Queue(maxsize=size)
+
+        QueueManager.register('get_queue', callable=lambda: self.queue)
+
+        self.manager = QueueManager(address=(host, int(port)), authkey=authkey)
+
+    def run(self):
+        self.server = self.manager.get_server()
+        self.server.serve_forever()
+
+    def put_job(self, job):
+        self.queue.put(job)
+
+    def first_job(self):
+        return self.queue.queue[0]
+
+    def has_work(self):
+        return not self.queue.empty()
+
+    def shutdown(self):
+        if self.server:
+            self.server.shutdown()
+
+
 def sample(last=0):
-    return xrange(last, 1000000)
+    return xrange(last, 1000000000)
 
 
 def run(target, size=10000, host='0.0.0.0:3050', key='taskmaster'):
     host, port = host.split(':')
 
-    queue = Queue.Queue(maxsize=size)
+    server = QueueServer(host, int(port), size=size, authkey=key)
 
-    QueueManager.register('get_queue', callable=lambda: queue)
-
-    manager = QueueManager(address=(host, int(port)), authkey=key)
-    server = QueueServer(manager)
-    server.daemon = True
-    server.start()
-
-    try:
-        mod_path, func_name = target.split(':', 1)
-    except ValueError:
-        raise ValueError('target must be in form of `path.to.module:function_name`')
-
-    module = __import__(mod_path, {}, {}, [func_name], -1)
-    callback = getattr(module, func_name)
-
-    # last=<last serialized job>
-    kwargs = {}
-
-    for job in callback(**kwargs):
-        queue.put(job)
-
-    while not Queue.empty():
-        time.sleep(0.1)
-
-    server.shutdown()
+    controller = Controller(server, target)
+    controller.start()
 
 
 def main():

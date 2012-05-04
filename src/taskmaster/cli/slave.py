@@ -7,10 +7,16 @@ taskmaster.cli.slave
 """
 
 from multiprocessing.managers import BaseManager
+from taskmaster.workers import ThreadPool
+import time
 
 
 class QueueManager(BaseManager):
     pass
+
+
+def sample(job):
+    print job
 
 
 def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
@@ -26,9 +32,12 @@ def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
     module = __import__(mod_path, {}, {}, [func_name], -1)
     callback = getattr(module, func_name)
 
-    pool = ThreadPool(queue, size=threads)
+    pool = ThreadPool(queue, callback, size=threads)
 
     # TODO: how do we know if we're done?
+    while True or not queue.empty():
+        time.sleep(0.000001)
+
     pool.join()
     callback(queue.get)
 
@@ -45,7 +54,7 @@ def main():
     if len(args) != 1:
         print 'Usage: tm-slave <callback>'
         sys.exit(1)
-    sys.exit(args[0], run(**options.__dict__))
+    sys.exit(run(args[0], **options.__dict__))
 
 if __name__ == '__main__':
     main()

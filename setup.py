@@ -18,6 +18,9 @@ setup(
             'tm-slave = taskmaster.cli.slave:main',
         ],
     },
+    install_requires=[
+        'progressbar',
+    ],
     tests_require=[
         'unittest2',
         'Nose>=1.0',
