@@ -25,12 +25,14 @@ Create an iterator, and callback::
 
     # taskmaster/example.py
     def get_jobs(last=0):
-        # last_job would be sent if state was resumed
+        # last would be sent if state was resumed
         # from a previous run
         for i in xrange(last, 100000000):
+            # jobs yielded must be serializeable with pickle
             yield i
 
     def handle_job(i):
+        # is i the unserialized job
         print "Got %r!" % i
 
 
