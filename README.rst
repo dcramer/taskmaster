@@ -1,9 +1,9 @@
 Taskmaster
 ----------
 
-Taskmaster is a simple distributed queue designed for handling large numbers of tasks.
+Taskmaster is a simple distributed queue designed for handling large numbers of one-off tasks.
 
-We built this at DISQUS to handle one-off tasks like "migrate this data to a new schema".
+We built this at DISQUS to handle frequent, but uncommon tasks like "migrate this data to a new schema".
 
 Why?
 ----
