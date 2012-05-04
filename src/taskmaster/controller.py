@@ -11,6 +11,7 @@ import time
 import cPickle as pickle
 from os import path, unlink
 from threading import Thread
+from taskmaster.util import import_target
 
 
 class Controller(object):
@@ -18,7 +19,7 @@ class Controller(object):
         cls = type(self)
 
         if isinstance(target, basestring):
-            target = cls.get_callable_target(target)
+            target = import_target(target, 'get_jobs')
 
         if not state_file:
             target_file = sys.modules[target.__module__].__file__
@@ -32,18 +33,6 @@ class Controller(object):
             self.pbar = cls.get_progressbar()
         else:
             self.pbar = None
-
-    @classmethod
-    def get_callable_target(cls, target):
-        try:
-            mod_path, func_name = target.split(':', 1)
-        except ValueError:
-            raise ValueError('target must be in form of `path.to.module:function_name`')
-
-        module = __import__(mod_path, {}, {}, [func_name], -1)
-        callback = getattr(module, func_name)
-
-        return callback
 
     @classmethod
     def get_progressbar(cls):

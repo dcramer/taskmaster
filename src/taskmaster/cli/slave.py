@@ -7,6 +7,7 @@ taskmaster.cli.slave
 """
 
 from multiprocessing.managers import BaseManager
+from taskmaster.util import import_target
 from taskmaster.workers import ThreadPool
 import time
 
@@ -24,16 +25,14 @@ def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
     m.connect()
     queue = m.get_queue()
 
-    mod_path, func_name = target.split(':', 1)
-    module = __import__(mod_path, {}, {}, [func_name], -1)
-    callback = getattr(module, func_name)
+    target = import_target(target, 'handle_job')
 
-    pool = ThreadPool(queue, callback, size=threads)
+    pool = ThreadPool(queue, target, size=threads)
     while pool.is_alive() and not queue.empty():
         time.sleep(0)
 
     pool.join()
-    callback(queue.get)
+    target(queue.get)
 
 
 def main():

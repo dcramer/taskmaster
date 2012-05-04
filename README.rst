@@ -38,15 +38,19 @@ Create an iterator, and callback::
 
 Spawn a master::
 
-    $ tm-master taskmaster.example:get_jobs
+    $ tm-master taskmaster.example
 
 Spawn a slave::
 
-    $ tm-slave taskmaster.example:handle_job
+    $ tm-slave taskmaster.example
 
 Or spawn 8 slaves (each containing a threadpool)::
 
-    $ tm-spawn taskmaster.example:handle_job 8
+    $ tm-spawn taskmaster.example 8
 
+Dont like the magical function discover for master/slave? Specify your own targets:
+
+    $ tm-master taskmaster.example:get_jobs
+    $ tm-slave taskmaster.example:handle_job
 
 .. note:: All arguments are optional, and will default to localhost with no auth key.
