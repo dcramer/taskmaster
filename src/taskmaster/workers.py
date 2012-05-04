@@ -19,19 +19,26 @@ class Worker(Thread):
 
     def run(self):
         self.running = True
-        while self.running:
-            try:
-                job_id, job = self.queue.get_nowait()
-            except Empty:
-                time.sleep(0.1)
-                continue
+        try:
+            while self.running:
+                try:
+                    job_id, job = self.queue.get_nowait()
+                except Empty:
+                    time.sleep(0)
+                    continue
+                except EOFError:
+                    return
 
-            try:
-                self.target(job)
-            except KeyboardInterrupt:
-                return
-            finally:
-                self.queue.task_done()
+                print repr(job)
+
+                try:
+                    self.target(job)
+                except KeyboardInterrupt:
+                    return
+                finally:
+                    self.queue.task_done()
+        finally:
+            self.running = False
 
 
 class ThreadPool(object):
@@ -44,7 +51,11 @@ class ThreadPool(object):
         for worker in self.workers:
             worker.start()
 
-    def join(self):
-        for worker in self.workers:
-            worker.running = False
-            worker.join()
+    def is_alive(self):
+        return any(w.running for w in self.workers)
+
+    def join(self, nowait=False):
+        for worker in (w for w in self.workers if w.running):
+            if nowait:
+                worker.running = False
+            worker.join(0)

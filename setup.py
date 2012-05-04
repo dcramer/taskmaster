@@ -10,7 +10,7 @@ setup(
     author="David Cramer",
     author_email="dcramer@gmail.com",
     url="https://github.com/dcramer/taskmaster",
-    packages=find_packages("src/taskmaster"),
+    packages=find_packages("src"),
     package_dir={'': 'src'},
     entry_points={
         'console_scripts': [

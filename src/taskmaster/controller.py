@@ -49,7 +49,7 @@ class Controller(object):
     def get_progressbar(cls):
         from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength
 
-        widgets = ['Status: ', Counter(), ' | ', Speed(), ' | ', Timer()]
+        widgets = ['Current Job: ', Counter(), ' | ', Speed(), ' | ', Timer()]
 
         pbar = ProgressBar(widgets=widgets, maxval=UnknownLength)
 
@@ -72,7 +72,7 @@ class Controller(object):
         last_job_id = None
         with open(self.state_file, 'w') as state_fp:
             while True:
-                time.sleep(0.000001)
+                time.sleep(0)
                 try:
                     job_id, job = self.server.first_job()
                 except IndexError:
@@ -115,10 +115,10 @@ class Controller(object):
 
         for job_id, job in enumerate(self.target(**kwargs), start_id):
             self.server.put_job((job_id, job))
-            time.sleep(0.000001)
+            time.sleep(0)
 
         while self.server.has_work():
-            time.sleep(0.000001)
+            time.sleep(0)
 
         state_writer.join(1)
         if self.pbar:

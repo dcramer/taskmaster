@@ -29,10 +29,8 @@ def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
     callback = getattr(module, func_name)
 
     pool = ThreadPool(queue, callback, size=threads)
-
-    # TODO: how do we know if we're done?
-    while True or not queue.empty():
-        time.sleep(0.000001)
+    while pool.is_alive() and not queue.empty():
+        time.sleep(0)
 
     pool.join()
     callback(queue.get)

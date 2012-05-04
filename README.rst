@@ -36,10 +36,15 @@ Create an iterator, and callback::
 
 Spawn a master::
 
-    tm-master taskmaster.example:get_jobs --host=0.0.0.0:3050 --key=foobar --size=10000
+    $ tm-master taskmaster.example:get_jobs
 
-Spawn slaves::
+Spawn as many slaves as you need::
 
-    tm-slave taskmaster.example:handle_job --host=127.0.0.1:3050 --key=foobar --threads=1
+    $ tm-slave taskmaster.example:handle_job
+    $ tm-slave taskmaster.example:handle_job
+    $ tm-slave taskmaster.example:handle_job
+    $ tm-slave taskmaster.example:handle_job
+    $ tm-slave taskmaster.example:handle_job
+
 
 .. note:: All arguments are optional, and will default to localhost with no auth key.

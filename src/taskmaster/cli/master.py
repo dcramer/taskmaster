@@ -20,7 +20,7 @@ class QueueServer(Thread):
     def __init__(self, host, port, size=None, authkey=None):
         Thread.__init__(self)
         self.daemon = True
-        self.server = None
+        self.started = False
         self.queue = Queue.Queue(maxsize=size)
 
         QueueManager.register('get_queue', callable=lambda: self.queue)
@@ -28,8 +28,9 @@ class QueueServer(Thread):
         self.manager = QueueManager(address=(host, int(port)), authkey=authkey)
 
     def run(self):
-        self.server = self.manager.get_server()
-        self.server.serve_forever()
+        self.started = True
+        server = self.manager.get_server()
+        server.serve_forever()
 
     def put_job(self, job):
         self.queue.put(job)
@@ -41,16 +42,20 @@ class QueueServer(Thread):
         return not self.queue.empty()
 
     def shutdown(self):
-        if self.server:
-            self.server.shutdown()
+        # TODO:
+        # if self.started:
+        #     self.manager.shutdown()
+        pass
 
 
-def run(target, size=10000, host='0.0.0.0:3050', key='taskmaster'):
+def run(target, reset=False, size=10000, host='0.0.0.0:3050', key='taskmaster'):
     host, port = host.split(':')
 
     server = QueueServer(host, int(port), size=size, authkey=key)
 
     controller = Controller(server, target)
+    if reset:
+        controller.reset()
     controller.start()
 
 
@@ -61,6 +66,7 @@ def main():
     parser.add_option("--host", dest="host", default='0.0.0.0:3050')
     parser.add_option("--size", dest="size", default='10000', type=int)
     parser.add_option("--key", dest="key", default='taskmaster')
+    parser.add_option("--reset", dest="reset", default=False, action='store_true')
     (options, args) = parser.parse_args()
     if len(args) != 1:
         print 'Usage: tm-master <callback>'
