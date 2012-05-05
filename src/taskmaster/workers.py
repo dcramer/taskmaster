@@ -33,7 +33,10 @@ class Worker(Thread):
             except KeyboardInterrupt:
                 return
             finally:
-                self.queue.task_done()
+                try:
+                    self.queue.task_done()
+                except EOFError:
+                    return
 
 
 class ThreadPool(object):
