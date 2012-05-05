@@ -32,7 +32,6 @@ def run(target, host='0.0.0.0:3050', key='taskmaster', threads=1):
         time.sleep(0)
 
     pool.join()
-    target(queue.get)
 
 
 def main():

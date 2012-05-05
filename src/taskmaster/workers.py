@@ -47,10 +47,11 @@ class ThreadPool(object):
             worker.start()
 
     def is_alive(self):
-        return any(w.running for w in self.workers)
+        return any(w.is_alive() for w in self.workers)
 
     def join(self, nowait=False):
         for worker in (w for w in self.workers if w.is_alive()):
             if nowait:
                 worker.running = False
             worker.join(0)
+            time.sleep(0)
