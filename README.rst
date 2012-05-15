@@ -18,6 +18,16 @@ required just to keep that around, and gains you very little.
 Taskmaster on the other hand is designed to take a resumable iterator, and only pull in a maximum number of
 jobs at a time (using standard Python Queue's). This ensures a consistent memory pattern that can scale linearly.
 
+Requirements
+------------
+
+Requirements **should** be handled by setuptools, but if they are not, you will need the following Python packages:
+
+* progressbar
+* pyzmq (zeromq)
+* gevent
+* gevent_zeromq
+
 Usage
 -----
 
@@ -58,4 +68,4 @@ Dont like the magical function discover for master/slave? Specify your own targe
     $ tm-master taskmaster.example:get_jobs
     $ tm-slave taskmaster.example:handle_job
 
-.. note:: All arguments are optional, and will default to localhost with no auth key.
+.. note:: All arguments are optional, and will default to localhost.
