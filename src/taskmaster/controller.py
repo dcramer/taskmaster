@@ -80,6 +80,8 @@ class Controller(object):
         last_job_id = None
         with open(self.state_file, 'w') as fp:
             while self.server.is_alive():
+                gevent.sleep(0)
+
                 try:
                     job_id, job = self.server.first_job()
                 except IndexError:
@@ -91,8 +93,6 @@ class Controller(object):
                 self.update_state(job_id, job, fp)
 
                 last_job_id = job_id
-
-                gevent.sleep(0)
 
     def reset(self):
         if path.exists(self.state_file):
