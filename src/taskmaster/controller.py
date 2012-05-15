@@ -15,8 +15,6 @@ from taskmaster.util import import_target
 
 class Controller(object):
     def __init__(self, server, target, state_file=None, progressbar=True):
-        cls = type(self)
-
         if isinstance(target, basestring):
             target = import_target(target, 'get_jobs')
 
@@ -29,15 +27,16 @@ class Controller(object):
         self.target = target
         self.state_file = state_file
         if progressbar:
-            self.pbar = cls.get_progressbar()
+            self.pbar = self.get_progressbar()
         else:
             self.pbar = None
 
-    @classmethod
-    def get_progressbar(cls):
-        from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength
+    def get_progressbar(self):
+        from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength, Value
 
-        widgets = ['Current Job: ', Counter(), ' | ', Speed(), ' | ', Timer()]
+        queue_size = Value(callback=lambda x: 'In-Queue: %d / %d' % (self.server.get_size(), self.server.size))
+
+        widgets = ['Completed Tasks: ', Counter(), ' | ', queue_size, ' | ', Speed(), ' | ', Timer()]
 
         pbar = ProgressBar(widgets=widgets, maxval=UnknownLength)
 

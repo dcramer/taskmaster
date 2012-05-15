@@ -30,3 +30,16 @@ class Speed(Widget):
         speed = (pbar.currval - self.startval) / pbar.seconds_elapsed
 
         return self.format % speed
+
+
+class Value(Widget):
+
+    def __init__(self, label=None, callback=None):
+        assert not (label and callback)
+        self.label = label
+        self.callback = callback
+
+    def update(self, pbar):
+        if self.callback:
+            return self.callback(pbar)
+        return self.label

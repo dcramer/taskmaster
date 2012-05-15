@@ -17,6 +17,7 @@ class Server(object):
     def __init__(self, host, port, size=None):
         self.daemon = True
         self.started = False
+        self.size = size
         self.queue = Queue(maxsize=size)
         self.address = 'tcp://%s:%s' % (host, port)
 
@@ -56,6 +57,9 @@ class Server(object):
 
     def first_job(self):
         return self.queue.queue[0]
+
+    def get_size(self):
+        return self.queue.qsize()
 
     def has_work(self):
         return not self.queue.empty()
