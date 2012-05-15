@@ -78,7 +78,7 @@ class Controller(object):
 
     def state_writer(self):
         last_job_id = None
-        with open(self.state_file, 'w') as fp:
+        with open(self.state_file, 'a') as fp:
             while self.server.is_alive():
                 gevent.sleep(0)
 
