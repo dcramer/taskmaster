@@ -7,9 +7,10 @@ taskmaster.cli.master
 """
 
 import cPickle as pickle
+import gevent
 from gevent_zeromq import zmq
 from taskmaster.controller import Controller
-from gevent.queue import Queue, Empty
+from gevent.queue import Queue, Empty, Full
 
 
 class Server(object):
@@ -47,7 +48,11 @@ class Server(object):
         self.shutdown()
 
     def put_job(self, job):
-        self.queue.put_nowait(job)
+        while True:
+            try:
+                return self.queue.put_nowait(job)
+            except Full:
+                gevent.sleep(0)
 
     def first_job(self):
         return self.queue.queue[0]

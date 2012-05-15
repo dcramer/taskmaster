@@ -10,7 +10,7 @@ taskmaster.example
 def get_jobs(last=0):
     # last_job would be sent if state was resumed
     # from a previous run
-    for i in xrange(last, 10000):
+    for i in xrange(last, 20000):
         yield i
 
 
