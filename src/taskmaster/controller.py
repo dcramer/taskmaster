@@ -35,7 +35,7 @@ class Controller(object):
         from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength, Value
 
         sizelen = len(str(self.server.size))
-        format = 'In-Queue: %-{}s / %-{}s'.format(sizelen, sizelen)
+        format = 'In-Queue: %%-%ds / %%-%ds' % (sizelen, sizelen)
 
         queue_size = Value(callback=lambda x: format % (self.server.get_size(), self.server.size))
 
