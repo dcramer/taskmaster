@@ -100,11 +100,7 @@ class Consumer(object):
     def get_job(self):
         self._wants_job = True
 
-        while True:
-            try:
-                return self.queue.get_nowait()
-            except Empty:
-                gevent.sleep(0)
+        return self.queue.get()
 
     def task_done(self):
         self.tasks_completed += 1

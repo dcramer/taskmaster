@@ -49,11 +49,7 @@ class Server(object):
         self.shutdown()
 
     def put_job(self, job):
-        while True:
-            try:
-                return self.queue.put_nowait(job)
-            except Full:
-                gevent.sleep(0)
+        return self.queue.put(job)
 
     def first_job(self):
         return self.queue.queue[0]
