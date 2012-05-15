@@ -61,13 +61,23 @@ class Controller(object):
         return {}
 
     def update_state(self, job_id, job, fp=None):
-        if job_id:
-            data = {
-                'job': job,
-                'job_id': job_id,
-            }
-        else:
-            data = {}
+        last_job_id = getattr(self, '_last_job_id', None)
+
+        if self.pbar:
+            self.pbar.update(job_id)
+
+        if job_id == last_job_id:
+            return
+
+        if not job:
+            return
+
+        last_job_id = job_id
+
+        data = {
+            'job': job,
+            'job_id': job_id,
+        }
         if not fp:
             with open(self.state_file, 'w') as fp:
                 pickle.dump(data, fp)
@@ -75,11 +85,7 @@ class Controller(object):
             fp.seek(0)
             pickle.dump(data, fp)
 
-        if self.pbar:
-            self.pbar.update(job_id)
-
     def state_writer(self):
-        last_job_id = None
         with open(self.state_file, 'a') as fp:
             while self.server.is_alive():
                 gevent.sleep(0)
@@ -87,14 +93,10 @@ class Controller(object):
                 try:
                     job_id, job = self.server.first_job()
                 except IndexError:
-                    continue
-
-                if not job or job_id == last_job_id:
+                    self.update_state(None, None, fp)
                     continue
 
                 self.update_state(job_id, job, fp)
-
-                last_job_id = job_id
 
     def reset(self):
         if path.exists(self.state_file):
