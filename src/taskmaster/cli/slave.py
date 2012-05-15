@@ -23,7 +23,7 @@ def main():
     import optparse
     import sys
     parser = optparse.OptionParser()
-    parser.add_option("--host", dest="host", default='0.0.0.0:3050')
+    parser.add_option("--host", dest="host", default='127.0.0.1:3050')
     parser.add_option("--progress", dest="progressbar", action="store_true", default=False)
     (options, args) = parser.parse_args()
     if len(args) != 1:

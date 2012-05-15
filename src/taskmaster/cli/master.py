@@ -86,7 +86,7 @@ def main():
     import optparse
     import sys
     parser = optparse.OptionParser()
-    parser.add_option("--host", dest="host", default='0.0.0.0:3050')
+    parser.add_option("--host", dest="host", default='127.0.0.1:3050')
     parser.add_option("--size", dest="size", default='10000', type=int)
     parser.add_option("--reset", dest="reset", default=False, action='store_true')
     (options, args) = parser.parse_args()
