@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name="taskmaster",
     license='Apache License 2.0',
-    version="0.4.4",
+    version="0.4.5",
     description="",
     author="David Cramer",
     author_email="dcramer@gmail.com",
