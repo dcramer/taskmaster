@@ -6,35 +6,48 @@ taskmaster.cli.master
 :license: Apache License 2.0, see LICENSE for more details.
 """
 
-from multiprocessing.managers import BaseManager
-from threading import Thread
+import cPickle as pickle
+from gevent_zeromq import zmq
 from taskmaster.controller import Controller
-import Queue
+from gevent.queue import Queue, Empty
 
 
-class QueueManager(BaseManager):
-    pass
-
-
-class QueueServer(Thread):
-    def __init__(self, host, port, size=None, authkey=None):
-        Thread.__init__(self)
+class Server(object):
+    def __init__(self, host, port, size=None):
         self.daemon = True
         self.started = False
-        self.queue = Queue.Queue(maxsize=size)
+        self.queue = Queue(maxsize=size)
+        self.address = 'tcp://%s:%s' % (host, port)
 
-        QueueManager.register('get_queue', callable=lambda: self.queue)
-
-        self.manager = QueueManager(address=(host, int(port)), authkey=authkey)
-
-    def run(self):
+    def start(self):
         self.started = True
-        server = self.manager.get_server()
-        print "Taskmaster server running on %r" % ':'.join(map(str, server.address))
-        server.serve_forever()
+        self.context = context = zmq.Context(1)
+
+        self.server = server = context.socket(zmq.REP)
+        server.bind(self.address)
+
+        print "Taskmaster server running on %r" % self.address
+
+        while self.started:
+            request = server.recv()
+            if request == 'GET':
+                try:
+                    job = self.queue.get_nowait()
+                except Empty:
+                    server.send('WAIT')
+                    continue
+
+                server.send('OK %s' % (pickle.dumps(job),))
+            elif request == 'DONE':
+                self.queue.task_done()
+                server.send('OK')
+            else:
+                server.send('ERROR Unrecognized command')
+
+        self.shutdown()
 
     def put_job(self, job):
-        self.queue.put(job)
+        self.queue.put_nowait(job)
 
     def first_job(self):
         return self.queue.queue[0]
@@ -46,16 +59,17 @@ class QueueServer(Thread):
         return self.started
 
     def shutdown(self):
-        # TODO:
-        # if self.started:
-        #     self.manager.shutdown()
+        if not self.started:
+            return
+        self.server.close()
+        self.context.term()
         self.started = False
 
 
-def run(target, reset=False, size=10000, host='0.0.0.0:3050', key='taskmaster'):
+def run(target, reset=False, size=10000, host='0.0.0.0:3050'):
     host, port = host.split(':')
 
-    server = QueueServer(host, int(port), size=size, authkey=key)
+    server = Server(host, int(port), size=size)
 
     controller = Controller(server, target)
     if reset:
@@ -69,7 +83,6 @@ def main():
     parser = optparse.OptionParser()
     parser.add_option("--host", dest="host", default='0.0.0.0:3050')
     parser.add_option("--size", dest="size", default='10000', type=int)
-    parser.add_option("--key", dest="key", default='taskmaster')
     parser.add_option("--reset", dest="reset", default=False, action='store_true')
     (options, args) = parser.parse_args()
     if len(args) != 1:

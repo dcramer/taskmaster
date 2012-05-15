@@ -27,14 +27,11 @@ def main():
     import sys
     parser = optparse.OptionParser()
     parser.add_option("--host", dest="host", default='0.0.0.0:3050')
-    parser.add_option("--key", dest="key", default='taskmaster')
-    parser.add_option("--threads", dest="threads", default=1, type=int)
-    # parser.add_option("--procs", dest="procs", default=1, type=int)
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'Usage: tm-spawn <callback> <processes>'
         sys.exit(1)
-    sys.exit(run(args[0], procs=int(args[1]), **options.__dict__))
+    sys.exit(run(args[0], procs=int(args[1]), progressbar=False, **options.__dict__))
 
 if __name__ == '__main__':
     main()

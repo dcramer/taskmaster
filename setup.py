@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name="taskmaster",
     license='Apache License 2.0',
-    version="0.3.1",
+    version="0.4.0",
     description="",
     author="David Cramer",
     author_email="dcramer@gmail.com",
@@ -21,6 +21,9 @@ setup(
     },
     install_requires=[
         'progressbar',
+        'gevent',
+        'gevent_zeromq',
+        # 'pyzmq-static',
     ],
     tests_require=[
         'unittest2',

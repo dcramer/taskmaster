@@ -6,11 +6,10 @@ taskmaster.controller
 :license: Apache License 2.0, see LICENSE for more details.
 """
 
-import sys
-import time
 import cPickle as pickle
+import gevent
+import sys
 from os import path, unlink
-from threading import Thread
 from taskmaster.util import import_target
 
 
@@ -50,6 +49,8 @@ class Controller(object):
             with open(self.state_file, 'r') as fp:
                 try:
                     return pickle.load(fp)
+                except EOFError:
+                    pass
                 except Exception, e:
                     print "There was an error reading from state file. Ignoring and continuing without."
                     import traceback
@@ -72,18 +73,18 @@ class Controller(object):
             fp.seek(0)
             pickle.dump(data, fp)
 
+        if self.pbar:
+            self.pbar.update(job_id)
+
     def state_writer(self):
         last_job_id = None
         with open(self.state_file, 'w') as fp:
             while self.server.is_alive():
-                time.sleep(0)
+                gevent.sleep(0.01)
                 try:
                     job_id, job = self.server.first_job()
                 except IndexError:
                     continue
-
-                if self.pbar:
-                    self.pbar.update(job_id)
 
                 if not job or job_id == last_job_id:
                     continue
@@ -105,21 +106,23 @@ class Controller(object):
         else:
             start_id = 0
 
-        self.server.start()
+        gevent.spawn(self.server.start)
+
+        gevent.sleep(0)
+
         if self.pbar:
             self.pbar.start()
+            self.pbar.update(start_id)
 
-        state_writer = Thread(target=self.state_writer)
-        state_writer.daemon = True
-        state_writer.start()
+        state_writer = gevent.spawn(self.state_writer)
 
         job_id, job = (None, None)
         for job_id, job in enumerate(self.target(**kwargs), start_id):
             self.server.put_job((job_id, job))
-            time.sleep(0)
+            gevent.sleep(0)
 
         while self.server.has_work():
-            time.sleep(0)
+            gevent.sleep(0)
 
         self.server.shutdown()
         state_writer.join(1)
