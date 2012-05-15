@@ -34,7 +34,10 @@ class Controller(object):
     def get_progressbar(self):
         from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength, Value
 
-        queue_size = Value(callback=lambda x: 'In-Queue: %d / %d' % (self.server.get_size(), self.server.size))
+        sizelen = len(str(self.server.size))
+        format = 'In-Queue: %-{}s / %-{}s'.format(sizelen, sizelen)
+
+        queue_size = Value(callback=lambda x: format % (self.server.get_size(), self.server.size))
 
         widgets = ['Completed Tasks: ', Counter(), ' | ', queue_size, ' | ', Speed(), ' | ', Timer()]
 
