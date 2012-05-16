@@ -64,4 +64,4 @@ Dont like the magical function discover for master/slave? Specify your own targe
     $ tm-master taskmaster.example:get_jobs
     $ tm-slave taskmaster.example:handle_job
 
-.. note:: All arguments are optional, and will default to localhost.
+.. note:: All arguments are optional, and the address will default to ``tcp://*:3050``.
