@@ -33,10 +33,6 @@ Usage
 
 Create an iterator, and callback::
 
-    import socket
-    # We must ensure default timeout **is not set** or random shit will hit the fan.
-    socket.setdefaulttimeout(None)
-
     # taskmaster/example.py
     def get_jobs(last=0):
         # last would be sent if state was resumed
