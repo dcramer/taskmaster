@@ -26,7 +26,7 @@ def main():
     import optparse
     import sys
     parser = optparse.OptionParser()
-    parser.add_option("--host", dest="host", default='0.0.0.0:3050')
+    parser.add_option("--address", dest="address", default='tcp://*:3050')
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'Usage: tm-spawn <callback> <processes>'
