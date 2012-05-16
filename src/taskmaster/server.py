@@ -11,7 +11,7 @@ import gevent
 import sys
 from gevent_zeromq import zmq
 from gevent.queue import Queue, Empty
-from os import path, unlink
+from os import path, unlink, rename
 from taskmaster.util import import_target
 
 
@@ -168,25 +168,22 @@ class Controller(object):
             'job': job,
             'job_id': job_id,
         }
-        if not fp:
-            with open(self.state_file, 'w') as fp:
-                pickle.dump(data, fp)
-        else:
-            fp.seek(0)
+
+        with open(self.state_file + '.tmp', 'w') as fp:
             pickle.dump(data, fp)
+        rename(self.state_file + '.tmp', self.state_file)
 
     def state_writer(self):
-        with open(self.state_file, 'w') as fp:
-            while self.server.is_alive():
-                gevent.sleep(0)
+        while self.server.is_alive():
+            gevent.sleep(0)
 
-                try:
-                    job_id, job = self.server.first_job()
-                except IndexError:
-                    self.update_state(None, None, fp)
-                    continue
+            try:
+                job_id, job = self.server.first_job()
+            except IndexError:
+                self.update_state(None, None)
+                continue
 
-                self.update_state(job_id, job, fp)
+            self.update_state(job_id, job)
 
     def reset(self):
         if path.exists(self.state_file):
