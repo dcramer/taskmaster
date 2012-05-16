@@ -15,4 +15,5 @@ def get_jobs(last=0):
 
 
 def handle_job(i):
-    print "Got %r!" % i
+    pass
+    # print "Got %r!" % i

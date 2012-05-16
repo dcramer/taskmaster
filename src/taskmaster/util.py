@@ -41,6 +41,8 @@ def import_target(target, default=None):
             e.strerror = 'Unable to load file (%s)' % e.strerror
             raise
         sys.modules[module_name] = module
+    elif '/' in path:
+        raise ValueError('File not found: %r' % path)
     else:
         module = __import__(path, {}, {}, [func_name], -1)
 

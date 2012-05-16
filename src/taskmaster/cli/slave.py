@@ -7,24 +7,21 @@ taskmaster.cli.slave
 """
 
 
-def run(target, host='0.0.0.0:3050', progressbar=True):
-    from taskmaster.consumer import Consumer
-    from taskmaster.util import import_target
+def run(target, address='tcp://127.0.0.1:3050', progressbar=True):
+    from taskmaster.client import Consumer, Client
 
-    host, port = host.split(':')
+    client = Client(address)
 
-    target = import_target(target, 'handle_job')
-
-    client = Consumer(host, port, progressbar=progressbar)
-    client.start(target)
+    consumer = Consumer(client, target, progressbar=progressbar)
+    consumer.start()
 
 
 def main():
     import optparse
     import sys
     parser = optparse.OptionParser()
-    parser.add_option("--host", dest="host", default='127.0.0.1:3050')
-    parser.add_option("--progress", dest="progressbar", action="store_true", default=False)
+    parser.add_option("--address", dest="address", default='tcp://127.0.0.1:3050')
+    parser.add_option("--no-progress", dest="progressbar", action="store_false", default=True)
     (options, args) = parser.parse_args()
     if len(args) != 1:
         print 'Usage: tm-slave <callback>'
