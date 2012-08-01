@@ -23,7 +23,7 @@ class Speed(Widget):
     def update(self, pbar):
         'Updates the widget with the current SI prefixed speed.'
 
-        if self.startval is 0:
+        if self.startval == 0:
             self.startval = pbar.currval
             return 'Rate:  --/s'
 
