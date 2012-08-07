@@ -28,3 +28,4 @@ pip-log.txt
 
 # Taskmaster
 *.state
+*.tmp
