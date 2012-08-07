@@ -6,6 +6,7 @@ taskmaster.util
 :license: Apache License 2.0, see LICENSE for more details.
 """
 import imp
+import logging
 import sys
 from os.path import exists
 
@@ -49,3 +50,10 @@ def import_target(target, default=None):
     callback = getattr(module, func_name)
 
     return callback
+
+
+def get_logger(inst, log_level='INFO'):
+    logger = logging.getLogger('%s.%s[%s]' % (inst.__module__, type(inst).__name__, id(inst)))
+    logger.setLevel(getattr(logging, log_level))
+    logger.addHandler(logging.StreamHandler())
+    return logger

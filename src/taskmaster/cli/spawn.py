@@ -27,6 +27,7 @@ def main():
     import sys
     parser = optparse.OptionParser()
     parser.add_option("--address", dest="address", default='tcp://*:3050')
+    parser.add_option("--log-level", dest="log_level", default='INFO')
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'Usage: tm-spawn <callback> <processes>'

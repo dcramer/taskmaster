@@ -12,11 +12,11 @@ import sys
 from gevent_zeromq import zmq
 from gevent.queue import Queue, Empty
 from os import path, unlink, rename
-from taskmaster.util import import_target
+from taskmaster.util import import_target, get_logger
 
 
 class Server(object):
-    def __init__(self, address, size=None):
+    def __init__(self, address, size=None, log_level='INFO'):
         self.daemon = True
         self.started = False
         self.size = size
@@ -25,6 +25,9 @@ class Server(object):
 
         self.context = zmq.Context(1)
         self.server = None
+        self.logger = get_logger(self, log_level)
+
+        self._has_fetched_jobs = False
 
     def send(self, cmd, data=''):
         self.server.send_multipart([cmd, data])
@@ -40,13 +43,13 @@ class Server(object):
         if self.server:
             self.server.close()
 
-        print "Taskmaster binding to %r" % self.address
         self.server = self.context.socket(zmq.REP)
         self.server.bind(self.address)
 
     def start(self):
         self.started = True
 
+        self.logger.info("Taskmaster binding to %r", self.address)
         self.bind()
 
         while self.started:
@@ -75,7 +78,11 @@ class Server(object):
             else:
                 self.send('ERROR', 'Unrecognized command')
 
+        self.logger.info('Shutting down')
         self.shutdown()
+
+    def mark_queue_filled(self):
+        self._has_fetched_jobs = True
 
     def put_job(self, job):
         return self.queue.put(job)
@@ -90,6 +97,8 @@ class Server(object):
         return self.size
 
     def has_work(self):
+        if not self._has_fetched_jobs:
+            return True
         return not self.queue.empty()
 
     def is_alive(self):
@@ -104,7 +113,7 @@ class Server(object):
 
 
 class Controller(object):
-    def __init__(self, server, target, state_file=None, progressbar=True):
+    def __init__(self, server, target, state_file=None, progressbar=True, log_level='INFO'):
         if isinstance(target, basestring):
             target = import_target(target, 'get_jobs')
 
@@ -120,6 +129,7 @@ class Controller(object):
             self.pbar = self.get_progressbar()
         else:
             self.pbar = None
+        self.logger = get_logger(self, log_level)
 
     def get_progressbar(self):
         from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength, Value
@@ -137,17 +147,14 @@ class Controller(object):
 
     def read_state(self):
         if path.exists(self.state_file):
-            print "Reading previous state from %r" % self.state_file
+            self.logger.info("Reading previous state from %r", self.state_file)
             with open(self.state_file, 'r') as fp:
                 try:
                     return pickle.load(fp)
                 except EOFError:
                     pass
                 except Exception, e:
-                    print "There was an error reading from state file. Ignoring and continuing without."
-                    import traceback
-                    traceback.print_exc()
-                    print e
+                    self.logger.exception("There was an error reading from state file. Ignoring and continuing without.\n%s", e)
         return {}
 
     def update_state(self, job_id, job, fp=None):
@@ -212,6 +219,7 @@ class Controller(object):
         for job_id, job in enumerate(self.target(**kwargs), start_id):
             self.server.put_job((job_id, job))
             gevent.sleep(0)
+        self.server.mark_queue_filled()
 
         while self.server.has_work():
             gevent.sleep(0)

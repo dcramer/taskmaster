@@ -10,7 +10,7 @@ import cPickle as pickle
 import gevent
 from gevent_zeromq import zmq
 from gevent.queue import Queue
-from taskmaster.util import import_target
+from taskmaster.util import import_target, get_logger
 
 
 class Worker(object):
@@ -34,7 +34,7 @@ class Worker(object):
 
 
 class Client(object):
-    def __init__(self, address, timeout=2500, retries=3):
+    def __init__(self, address, timeout=2500, retries=3, log_level='INFO'):
         self.address = address
         self.timeout = timeout
         self.retries = retries
@@ -42,14 +42,15 @@ class Client(object):
         self.context = zmq.Context(1)
         self.poller = zmq.Poller()
         self.client = None
+        self.logger = get_logger(self, log_level)
 
     def reconnect(self):
         if self.client:
             self.poller.unregister(self.client)
             self.client.close()
-            print "Reconnecting to server on %r" % self.address
+            self.logger.info('Reconnecting to server on %r', self.address)
         else:
-            print "Connecting to server on %r" % self.address
+            self.logger.info('Connecting to server on %r', self.address)
 
         self.client = self.context.socket(zmq.REQ)
         self.client.setsockopt(zmq.LINGER, 0)
@@ -98,7 +99,7 @@ class Client(object):
 
 
 class Consumer(object):
-    def __init__(self, client, target, progressbar=True):
+    def __init__(self, client, target, progressbar=True, log_level='INFO'):
         if isinstance(target, basestring):
             target = import_target(target, 'handle_job')
 
@@ -111,6 +112,7 @@ class Consumer(object):
             self.pbar = None
 
         self._wants_job = False
+        self.logger = get_logger(self, log_level)
 
     def get_progressbar(self):
         from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength
@@ -153,6 +155,7 @@ class Consumer(object):
 
             reply = self.client.send('GET')
             if not reply:
+                self.logger.error('No response form server; shutting down.')
                 break
 
             cmd, data = reply
@@ -164,6 +167,7 @@ class Consumer(object):
             elif cmd == 'QUIT':
                 break
 
+        self.logger.info('Shutting down')
         self.shutdown()
 
     def shutdown(self):
