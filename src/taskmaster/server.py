@@ -118,7 +118,7 @@ class Controller(object):
             target = import_target(target, 'get_jobs')
 
         if not state_file:
-            target_file = sys.modules[target.__module__].__file__
+            target_file = sys.modules[target.__module__].__file__.rsplit('.', 1)[0]
             state_file = path.join(path.dirname(target_file),
                 '%s.state' % (path.basename(target_file),))
 
