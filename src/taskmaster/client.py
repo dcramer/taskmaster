@@ -64,8 +64,6 @@ class Client(object):
         reply = None
 
         while retries > 0:
-            gevent.sleep(0)
-
             self.client.send_multipart(request)
             try:
                 items = self.poller.poll(self.timeout)
@@ -81,6 +79,9 @@ class Client(object):
                 else:
                     break
                 retries -= 1
+
+            # We only sleep if we need to retry
+            gevent.sleep(0.01)
 
         return reply
 

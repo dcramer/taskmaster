@@ -183,7 +183,9 @@ class Controller(object):
 
     def state_writer(self):
         while self.server.is_alive():
-            gevent.sleep(0)
+            # state is not guaranteed accurate, as we do not
+            # update the file on every iteration
+            gevent.sleep(0.01)
 
             try:
                 job_id, job = self.server.first_job()
@@ -208,6 +210,7 @@ class Controller(object):
 
         gevent.spawn(self.server.start)
 
+        # context switch so the server can spawn
         gevent.sleep(0)
 
         if self.pbar:
@@ -223,7 +226,7 @@ class Controller(object):
         self.server.mark_queue_filled()
 
         while self.server.has_work():
-            gevent.sleep(0)
+            gevent.sleep(0.01)
 
         # Give clients a few seconds to receive a DONE message
         gevent.sleep(3)
