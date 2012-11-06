@@ -28,6 +28,15 @@ Requirements **should** be handled by setuptools, but if they are not, you will 
 * gevent
 * gevent_zeromq
 
+
+A note on Gevent
+----------------
+
+Being that Taskmaster uses gevent for both its iterator task (master) and its consumers, your application will need
+to correctly implement non-blocking gevent compatible callers. In most cases this won't be a problem, but if you're
+using the network you'll need to look for a compatible library for your adapter. For example, there is an alternative
+version of ``psycopg2`` designed for gevent called ``gevent-psycopg2``.
+
 Usage
 -----
 
