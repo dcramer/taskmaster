@@ -10,6 +10,7 @@ import cPickle as pickle
 import gevent
 from gevent_zeromq import zmq
 from gevent.queue import Queue
+from taskmaster.constants import DEFAULT_LOG_LEVEL, DEFAULT_CALLBACK_TARGET
 from taskmaster.util import import_target, get_logger
 
 
@@ -34,7 +35,7 @@ class Worker(object):
 
 
 class Client(object):
-    def __init__(self, address, timeout=2500, retries=3, log_level='INFO'):
+    def __init__(self, address, timeout=2500, retries=3, log_level=DEFAULT_LOG_LEVEL):
         self.address = address
         self.timeout = timeout
         self.retries = retries
@@ -99,9 +100,9 @@ class Client(object):
 
 
 class Consumer(object):
-    def __init__(self, client, target, progressbar=True, log_level='INFO'):
+    def __init__(self, client, target, progressbar=True, log_level=DEFAULT_LOG_LEVEL):
         if isinstance(target, basestring):
-            target = import_target(target, 'handle_job')
+            target = import_target(target, DEFAULT_CALLBACK_TARGET)
 
         self.client = client
         self.target = target

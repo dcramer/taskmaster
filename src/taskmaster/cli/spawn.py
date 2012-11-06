@@ -8,6 +8,7 @@ taskmaster.cli.spawn
 
 from multiprocessing import Process
 from taskmaster.cli.slave import run as run_slave
+from taskmaster.constants import DEFAULT_LOG_LEVEL, DEFAULT_ADDRESS
 
 
 def run(target, procs, **kwargs):
@@ -26,8 +27,8 @@ def main():
     import optparse
     import sys
     parser = optparse.OptionParser()
-    parser.add_option("--address", dest="address", default='tcp://*:3050')
-    parser.add_option("--log-level", dest="log_level", default='INFO')
+    parser.add_option("--address", dest="address", default=DEFAULT_ADDRESS)
+    parser.add_option("--log-level", dest="log_level", default=DEFAULT_LOG_LEVEL)
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'Usage: tm-spawn <callback> <processes>'

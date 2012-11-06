@@ -5,6 +5,7 @@ taskmaster.util
 :copyright: (c) 2010 DISQUS.
 :license: Apache License 2.0, see LICENSE for more details.
 """
+
 import imp
 import logging
 import sys
@@ -27,8 +28,6 @@ def import_target(target, default=None):
     """
     if ':' not in target:
         target += ':%s' % default
-    else:
-        raise ValueError('target must be in form of `path.to.module:function_name`')
 
     path, func_name = target.split(':', 1)
 

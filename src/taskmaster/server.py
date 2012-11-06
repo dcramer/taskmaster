@@ -12,11 +12,12 @@ import sys
 from gevent_zeromq import zmq
 from gevent.queue import Queue, Empty
 from os import path, unlink, rename
+from taskmaster.constants import DEFAULT_LOG_LEVEL, DEFAULT_ITERATOR_TARGET
 from taskmaster.util import import_target, get_logger
 
 
 class Server(object):
-    def __init__(self, address, size=None, log_level='INFO'):
+    def __init__(self, address, size=None, log_level=DEFAULT_LOG_LEVEL):
         self.daemon = True
         self.started = False
         self.size = size
@@ -113,9 +114,9 @@ class Server(object):
 
 
 class Controller(object):
-    def __init__(self, server, target, state_file=None, progressbar=True, log_level='INFO'):
+    def __init__(self, server, target, state_file=None, progressbar=True, log_level=DEFAULT_LOG_LEVEL):
         if isinstance(target, basestring):
-            target = import_target(target, 'get_jobs')
+            target = import_target(target, DEFAULT_ITERATOR_TARGET)
 
         if not state_file:
             target_file = sys.modules[target.__module__].__file__.rsplit('.', 1)[0]
