@@ -64,4 +64,10 @@ Dont like the magical function discover for master/slave? Specify your own targe
     $ tm-master taskmaster.example:get_jobs
     $ tm-slave taskmaster.example:handle_job
 
+Maybe you simply need to run things on the same server?
+
+::
+
+    $ tm-run taskmaster/example.py 8
+
 .. note:: All arguments are optional, and the address will default to ``tcp://0.0.0.0:3050``.
