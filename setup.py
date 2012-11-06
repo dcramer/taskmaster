@@ -17,6 +17,7 @@ setup(
             'tm-master = taskmaster.cli.master:main',
             'tm-slave = taskmaster.cli.slave:main',
             'tm-spawn = taskmaster.cli.spawn:main',
+            'tm-run = taskmaster.cli.run:main',
         ],
     },
     install_requires=[
