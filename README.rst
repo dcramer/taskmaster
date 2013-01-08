@@ -60,6 +60,10 @@ Spawn a master::
 
     $ tm-master taskmaster.example
 
+You can also pass keyword arguments for the master::
+
+    $ tm-master taskmaster.example argument=value
+
 Spawn a slave::
 
     $ tm-slave taskmaster.example

@@ -8,6 +8,7 @@ taskmaster.controller
 
 import cPickle as pickle
 import gevent
+import hashlib
 import sys
 from gevent_zeromq import zmq
 from gevent.queue import Queue, Empty
@@ -114,17 +115,25 @@ class Server(object):
 
 
 class Controller(object):
-    def __init__(self, server, target, state_file=None, progressbar=True, log_level=DEFAULT_LOG_LEVEL):
+    def __init__(self, server, target, kwargs=None, state_file=None, progressbar=True, log_level=DEFAULT_LOG_LEVEL):
         if isinstance(target, basestring):
             target = import_target(target, DEFAULT_ITERATOR_TARGET)
 
         if not state_file:
             target_file = sys.modules[target.__module__].__file__.rsplit('.', 1)[0]
             state_file = path.join(path.dirname(target_file),
-                '%s.state' % (path.basename(target_file),))
+                '%s' % (path.basename(target_file),))
+            if kwargs:
+                checksum = hashlib.md5()
+                for k, v in sorted(kwargs.items()):
+                    checksum.update('%s=%s' % (k, v))
+                state_file += '.%s' % checksum.hexdigest()
+            state_file += '.state'
+            print state_file
 
         self.server = server
         self.target = target
+        self.target_kwargs = kwargs
         self.state_file = state_file
         if progressbar:
             self.pbar = self.get_progressbar()
@@ -200,7 +209,11 @@ class Controller(object):
             unlink(self.state_file)
 
     def start(self):
-        kwargs = {}
+        if self.target_kwargs:
+            kwargs = self.target_kwargs.copy()
+        else:
+            kwargs = {}
+        
         last_job = self.read_state()
         if last_job:
             kwargs['last'] = last_job['job']

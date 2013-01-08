@@ -7,9 +7,10 @@ taskmaster.example
 """
 
 
-def get_jobs(last=0):
+def get_jobs(last=0, **kwargs):
     # last_job would be sent if state was resumed
     # from a previous run
+    print 'Running with options: %r' % kwargs
     for i in xrange(last, 20000):
         yield i
 

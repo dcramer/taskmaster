@@ -56,3 +56,7 @@ def get_logger(inst, log_level='INFO'):
     logger.setLevel(getattr(logging, log_level))
     logger.addHandler(logging.StreamHandler())
     return logger
+
+
+def parse_options(args):
+    return dict(a.split('=', 1) for a in args)
