@@ -49,7 +49,7 @@ def main():
     parser.add_option("--get-jobs-callback", dest="get_jobs_target", default=DEFAULT_ITERATOR_TARGET)
     parser.add_option("--handle-job-callback", dest="handle_job_target", default=DEFAULT_CALLBACK_TARGET)
     (options, args) = parser.parse_args()
-    if len(args) != 2:
+    if len(args) < 2:
         print 'Usage: tm-run <script> <processes> [key=value, key2=value2]'
         sys.exit(1)
 
