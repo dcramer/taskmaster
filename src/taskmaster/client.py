@@ -157,7 +157,7 @@ class Consumer(object):
 
             reply = self.client.send('GET')
             if not reply:
-                self.logger.error('No response form server; shutting down.')
+                self.logger.error('No response from server; shutting down.')
                 break
 
             cmd, data = reply
