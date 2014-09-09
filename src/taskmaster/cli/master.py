@@ -7,11 +7,12 @@ taskmaster.cli.master
 """
 
 from taskmaster.util import parse_options
-from taskmaster.constants import DEFAULT_LOG_LEVEL, DEFAULT_ADDRESS, \
-  DEFAULT_BUFFER_SIZE
+from taskmaster.constants import (DEFAULT_LOG_LEVEL,
+                                  DEFAULT_ADDRESS, DEFAULT_BUFFER_SIZE)
 
 
-def run(target, kwargs=None, reset=False, size=DEFAULT_BUFFER_SIZE, address=DEFAULT_ADDRESS, log_level=DEFAULT_LOG_LEVEL):
+def run(target, kwargs=None, reset=False, size=DEFAULT_BUFFER_SIZE,
+        address=DEFAULT_ADDRESS, log_level=DEFAULT_LOG_LEVEL):
     from taskmaster.server import Server, Controller
 
     server = Server(address, size=size, log_level=log_level)

@@ -15,13 +15,15 @@ from taskmaster.constants import (
 
 
 def run(target, address=DEFAULT_ADDRESS, progressbar=True,
-        log_level=DEFAULT_LOG_LEVEL, retries=DEFAULT_RETRIES, timeout=DEFAULT_TIMEOUT):
+        log_level=DEFAULT_LOG_LEVEL, retries=DEFAULT_RETRIES,
+        timeout=DEFAULT_TIMEOUT):
     from taskmaster.client import Consumer, Client
 
     client = Client(address, log_level=log_level, retries=retries,
-            timeout=timeout)
+                    timeout=timeout)
 
-    consumer = Consumer(client, target, progressbar=progressbar, log_level=log_level)
+    consumer = Consumer(client, target, progressbar=progressbar,
+                        log_level=log_level)
     consumer.start()
 
 

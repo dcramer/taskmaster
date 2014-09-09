@@ -115,14 +115,15 @@ class Server(object):
 
 
 class Controller(object):
-    def __init__(self, server, target, kwargs=None, state_file=None, progressbar=True, log_level=DEFAULT_LOG_LEVEL):
+    def __init__(self, server, target, kwargs=None, state_file=None,
+                 progressbar=True, log_level=DEFAULT_LOG_LEVEL):
         if isinstance(target, basestring):
             target = import_target(target, DEFAULT_ITERATOR_TARGET)
 
         if not state_file:
             target_file = sys.modules[target.__module__].__file__.rsplit('.', 1)[0]
             state_file = path.join(path.dirname(target_file),
-                '%s' % (path.basename(target_file),))
+                                   '%s' % (path.basename(target_file),))
             if kwargs:
                 checksum = hashlib.md5()
                 for k, v in sorted(kwargs.items()):
@@ -142,7 +143,8 @@ class Controller(object):
         self.logger = get_logger(self, log_level)
 
     def get_progressbar(self):
-        from taskmaster.progressbar import Counter, Speed, Timer, ProgressBar, UnknownLength, Value
+        from taskmaster.progressbar import (Counter, Speed, Timer, ProgressBar,
+                                            UnknownLength, Value)
 
         sizelen = len(str(self.server.size))
         format = 'In-Queue: %%-%ds / %%-%ds' % (sizelen, sizelen)
@@ -213,7 +215,7 @@ class Controller(object):
             kwargs = self.target_kwargs.copy()
         else:
             kwargs = {}
-        
+
         last_job = self.read_state()
         if last_job:
             kwargs['last'] = last_job['job']

@@ -9,13 +9,16 @@ taskmaster.cli.run
 from multiprocessing import Process
 from taskmaster.cli.spawn import run as run_spawn
 from taskmaster.cli.master import run as run_master
-from taskmaster.constants import DEFAULT_LOG_LEVEL, DEFAULT_ADDRESS, \
-  DEFAULT_ITERATOR_TARGET, DEFAULT_CALLBACK_TARGET, DEFAULT_BUFFER_SIZE, \
-  DEFAULT_RETRIES, DEFAULT_TIMEOUT
+from taskmaster.constants import (DEFAULT_LOG_LEVEL, DEFAULT_ADDRESS,
+                                  DEFAULT_ITERATOR_TARGET,
+                                  DEFAULT_CALLBACK_TARGET,
+                                  DEFAULT_BUFFER_SIZE, DEFAULT_RETRIES,
+                                  DEFAULT_TIMEOUT)
 from taskmaster.util import parse_options
 
 
-def run(get_jobs_target, handle_job_target, procs, kwargs=None, log_level=DEFAULT_LOG_LEVEL,
+def run(get_jobs_target, handle_job_target, procs,
+        kwargs=None, log_level=DEFAULT_LOG_LEVEL,
         address=DEFAULT_ADDRESS, reset=False, size=DEFAULT_BUFFER_SIZE,
         retries=DEFAULT_RETRIES, timeout=DEFAULT_TIMEOUT):
     pool = [
