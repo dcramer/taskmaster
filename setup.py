@@ -6,7 +6,8 @@ setup(
     name="taskmaster",
     license='Apache License 2.0',
     version="0.8.2",
-    description="",
+    description=("A simple distributed queue designed for "
+                 "handling one-off tasks with large sets of tasks"),
     author="David Cramer",
     author_email="dcramer@gmail.com",
     url="https://github.com/dcramer/taskmaster",
